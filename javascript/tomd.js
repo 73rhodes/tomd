@@ -14,8 +14,11 @@
 /*global node2md*/
 
 
-var h2md = (function () {
-  console.log('hello world');
+/**
+ * expose tomd as a module
+ */
+
+var tomd = (function () {
 
   var listLevel = 0;
   var listBullet = "- ";
@@ -119,8 +122,8 @@ var h2md = (function () {
       break;
 
     default:
-      markdown += "&lt;" + node.nodeName + "&gt;" +
-        processChildren(children) + "&lt;/" + node.nodeName + "&gt; ";
+      markdown += "<" + node.nodeName + ">" +
+        processChildren(children) + "</" + node.nodeName + "> ";
       break;
 
     }
@@ -175,18 +178,6 @@ var h2md = (function () {
     return node2md(node).trim().replace(/[\n]{2,}/g, "\n\n");
   }
 
-  function testmd() {
-    var html = document.getElementById('htmlside');
-    var mdside = document.getElementById('markdownside');
-    var md = tomd(html).trim().replace(/[\n]{2,}/g, "\n\n");
-    //console.log(md);
-    mdside.innerHTML = md;
-  }
+  return tomd;
 
-  return {
-    "tomd": tomd,
-    "testmd": testmd // remove this later
-  };
-
-  // end
 }());
