@@ -65,15 +65,19 @@
     switch (node.nodeName) {
 
     case 'B':
-      markdown += "**" + processChildren(children) + "**";
+      markdown += '**' + processChildren(children) + '**';
       break;
 
     case 'I':
-      markdown += "*" + processChildren(children) + "*";
+      markdown += '*' + processChildren(children) + '*';
+      break;
+
+    case 'DEL':
+      markdown += '~~' + processChildren(children) + '~~';
       break;
 
     case 'HR':
-      markdown += "* * *\n\n";
+      markdown += '* * *\n\n';
       break;
 
 
@@ -87,21 +91,25 @@
       var size = parseInt(node.nodeName.charAt(1), 10);
       var hdr  = "";
       while (size--) {
-        hdr += "#";
+        hdr += '#';
       }
-      markdown += "\n\n" + hdr + " " + processChildren(children) + "\n\n";
+      markdown += '\n\n' + hdr + ' ' + processChildren(children) + '\n\n';
+      break;
+
+    case 'BLOCKQUOTE':
+      markdown += '> ' + processChildren(children) + '\n\n';
       break;
 
     case 'DIV':
     case 'P':
     case 'SECTION':
-      markdown += "\n\n" + processChildren(children) + "\n\n";
+      markdown += '\n\n' + processChildren(children) + '\n\n';
       break;
 
     case 'PRE':
       preblock = true;
       if (children[0] && children[0].nodeName === 'CODE') {
-        markdown += "\n\n``" + processChildren(children) + "``\n\n";
+        markdown += '\n\n``' + processChildren(children) + '``\n\n';
       } else {
         markdown += "\n\n&lt;pre&gt;\n" + processChildren(children) + "\n&lt;/pre&gt;\n\n";
       }
@@ -145,7 +153,7 @@
 
     default:
       markdown += "<" + node.nodeName + ">" +
-        processChildren(children) + "</" + node.nodeName + "> ";
+        processChildren(children) + "</" + node.nodeName + ">";
       break;
 
     }
@@ -204,7 +212,8 @@
     if (typeof node.nodeType === 'undefined') {
       throw(new Error("Invalid argument; not a Node object"));
     }
-    return node2md(node).trim().replace(/[\n]{2,}/g, "\n\n");
+    //return node2md(node).trim().replace(/[\n]{2,}/g, "\n\n");
+    return node2md(node).replace(/^[\n]+/, "").replace(/[\n]{2,}/g, "\n\n");
   }
 
   //return tomd;
