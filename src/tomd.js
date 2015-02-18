@@ -18,7 +18,16 @@
  * expose tomd as a module
  */
 
-var tomd = (function () {
+(function (global, module) {
+
+
+  /**
+   * Exports.
+   */
+
+  var exports = module.exports;
+  module.exports = tomd;
+
 
   var listLevel = 0;
   var listBullet = "- ";
@@ -54,6 +63,19 @@ var tomd = (function () {
 
     // nodeName and tagName should be synonymous
     switch (node.nodeName) {
+
+    case 'B':
+      markdown += "**" + processChildren(children) + "**";
+      break;
+
+    case 'I':
+      markdown += "*" + processChildren(children) + "*";
+      break;
+
+    case 'HR':
+      markdown += "* * *\n\n";
+      break;
+
 
     case 'H1':
     case 'H2':
@@ -137,7 +159,11 @@ var tomd = (function () {
     var markdown  = "";
     // node.data & node.nodeValue should be synonymous
     if (node.data.trim() !== "") {
-      markdown += node.data.replace(/^[\n\s\t]+/, "").replace(/[\s]+/g, " ").replace(/</g, "&amp;lt;").replace(/>/g, "&amp;gt;");
+      //markdown += node.data.replace(/^[\n\s\t]+/, "")
+      //  .replace(/[\s]+/g, " ")
+      //  .replace(/</g, "&amp;lt;")
+      //  .replace(/>/g, "&amp;gt;");
+      markdown += node.data.replace(/^[\n\t]+/, "").replace(/[\s]+/g, " ").replace(/</g, "&amp;lt;").replace(/>/g, "&amp;gt;");
     }
     return markdown;
   }
@@ -175,9 +201,19 @@ var tomd = (function () {
   }
 
   function tomd(node) {
+    if (typeof node.nodeType === 'undefined') {
+      throw(new Error("Invalid argument; not a Node object"));
+    }
     return node2md(node).trim().replace(/[\n]{2,}/g, "\n\n");
   }
 
-  return tomd;
+  //return tomd;
 
-}());
+  if ('undefined' != typeof window) {
+    window.tomd = module.exports;
+  }
+
+})(
+    this
+  , 'undefined' != typeof module ? module : {exports: {}}
+);
