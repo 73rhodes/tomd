@@ -23,7 +23,7 @@
 
       <div class="col-md-6">
         <div id="htmlside" class="well" contenteditable="true" onkeyup="updatemd();">
-          <h1 id="hello">Edit Me <small>start typing here<small></h1>
+          <h1 id="hello">Edit Me <small>start typing here</small></h1>
           Bare text with
           <small>inline</small> 
           elements.<br/>
@@ -44,13 +44,12 @@
           </ul>
           Bare text and line breaks.<br/>
           <p>
-            &lt;pre&gt;escaped chevrons&lt;/pre&gt;
-          </p>
           <code>
             function foo(bar) {
               return bar / bar + 1;
             }
           </code>
+          </p>
 <pre>
 Preformatted, non-code text blocks.
 Should support newlines.
@@ -66,7 +65,7 @@ print("evidently are not working");
         <pre id="markd ownside" class="well">
         </pre>
         -->
-        <textarea id="markdownside" class="form-control" rows="25">some text</textarea>
+        <textarea id="markdownside" class="form-control" rows="25" onkeyup="updatehtml();">some text</textarea>
       </div>
 
     </div>
@@ -77,12 +76,16 @@ print("evidently are not working");
   <script type="text/javascript" src="lib/javascript/marked.min.js"></script>
   <script type="text/javascript" src="src/tomd.js"></script>
   <script type="text/javascript">
+    function updatehtml() {
+      var ht = marked(markdownside.value);
+      htmlside.innerHTML = ht;
+      //alert(ht);
+    }
     function updatemd() {
-      //var html = document.getElementById('htmlside');
-      var mdside = document.getElementById('markdownside');
+      //var mdside = document.getElementById('markdownside');
       var md = tomd(htmlside); //.trim().replace(/[\n]{2,}/g, "\n\n");
-      mdside.value = md;
-      var str = mdside.value
+      markdownside.value = md;
+      //var str = mdside.value
     }
     updatemd();
   </script>
