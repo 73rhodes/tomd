@@ -6,40 +6,38 @@ function elem(str) {
 
 describe('tomd', function () {
 
-  it('should be a function', function () {
+  it('is a function', function () {
     expect(tomd).to.be.a('function');
   });
 
-  it('should throw err on null arg', function () {
+  it('throws err on null arg', function () {
     expect(tomd).withArgs(null).to.throwException();
   });
 
-  it('should throw err on non-object arg', function () {
+  it('throws err on non-object arg', function () {
     expect(tomd).withArgs('some string').to.throwException();
   });
 
-  it('should throw err on non DOM Node object', function () {
+  it('throws err on non DOM Node object', function () {
     expect(tomd).withArgs({}).to.throwException();
   });
 
-  it('should not throw on DOM Node object', function () {
+  it('accepts DOM Node object', function () {
     expect(tomd).withArgs(elem('<h1>hi</h1>')).to.not.throwException();
   });
 
-  describe('Paragraphs', function() {
+  describe('Paragraphs', function () {
     it('One line', function () {
       var dom = elem('<p>one line paragraph</p>');
       var md  = tomd(dom);
       expect(md).to.equal('one line paragraph\n\n');
     });
 
-    /*
-    it('Multiline', function () {
-      var dom = elem('<p>multi-line<br/>paragraph</p>');
+    it('GFM Multiline paragraph', function () {
+      var dom = elem('<p>roses are red<br/>violets are blue</p>');
       var md  = tomd(dom);
-      expect(md).to.equal('multi-line\nparagraph\n\n');
+      expect(md).to.equal('roses are red\nviolets are blue\n\n');
     });
-    // */
   });
 
   describe('Headings', function () {
@@ -72,22 +70,17 @@ describe('tomd', function () {
       expect(md).to.equal('> now is the time\n\n');
     });
 
-    it('line break');
-    /* , function () {
+    it('line break', function () {
       var dom = elem('<blockquote>now is the time<br/>for all good cats</blockquote>');
       var md  = tomd(dom);
       expect(md).to.equal('> now is the time\n> for all good cats\n\n');
     });
-    // */
 
-    it('multiple line breaks');
-    /* , function () {
-      var dom = elem('<blockquote>now is the time<br/><br/><br/>for all good cats</blockquote>');
+    it('multiple line breaks', function () {
+      var dom = elem('<blockquote>now is the time<br/><br/>for all good cats</blockquote>');
       var md  = tomd(dom);
       expect(md).to.equal('> now is the time\n\n> for all good cats\n\n');
     });
-    // */
-
   });
 
   describe('Text styling', function () {
@@ -98,20 +91,17 @@ describe('tomd', function () {
       expect(md).to.equal('**bold text**');
     });
 
-    // This currently fails
-    /*
-    it ('should process B inline', function () {
+    it('Inline bold', function () {
       var dom = elem('<p><b>Bold</b>ness</p>');
       var md  = tomd(dom);
-      expect(md).to.equal('**Bold**ness');
+      expect(md).to.equal('**Bold**ness\n\n');
     });
 
-    it ('should process B between text nodes', function () {
+    it('Inline bold with space', function () {
       var dom = elem('<p>goodbye <b>cruel</b> world!</p>');
       var md  = tomd(dom);
-      expect(md).to.equal('goodbye **cruel** world!');
+      expect(md).to.equal('goodbye **cruel** world!\n\n');
     });
-    // */
 
     it('Italic', function () {
       var dom = elem('<p><i>Never</i> say never</p>');
@@ -143,13 +133,39 @@ describe('tomd', function () {
       var md  = tomd(dom);
       expect(md).to.equal('~~strikethrough~~');
     });
-
   });
 
-  describe('Lists', function () {
-    it('Unordered list');
-    it('Ordered list');
-    it('Nested lists');
+  describe('Unordered lists', function () {
+    it('Empty list', function () {
+      var dom = elem('<ul></ul>');
+      var md  = tomd(dom);
+      expect(md).to.equal('');
+    });
+
+    it('List items', function () {
+      var dom = elem('<ul><li>John</li><li>Paul</li><li>George</li><li>Ringo</li></ul>');
+      var md  = tomd(dom);
+      expect(md).to.equal('- John\n- Paul\n- George\n- Ringo\n\n');
+    });
+  });
+
+  describe('Ordered lists', function () {
+    it('Empty list', function () {
+      expect(tomd(elem('<ol></ol>'))).to.equal('');
+    });
+
+    it('Ordered items', function () {
+      expect(tomd(elem('<ol><li>alpha</li><li>beta</li></ol>'))).to.equal('1. alpha\n1. beta\n\n');
+    });
+  });
+
+  describe('Nested lists', function () {
+    it('should work');
+    /*, function () {
+      expect(tomd(elem('<ul><li>hello</li><ul><li>world</li></ul></ul>')))
+        .to.equal('- hello\n  - world\n\n');
+    });
+    // */
   });
 
   describe('Code formatting', function () {
@@ -169,7 +185,6 @@ describe('tomd', function () {
     });
   });
 
-  describe('Newlines');
   describe('Task lists');
   describe('References');
   describe('Fenced code blocks');

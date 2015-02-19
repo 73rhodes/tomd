@@ -11,27 +11,29 @@
  *   var markdown = tomd($("<h1>Hello <small>world!</small></h1>")[0]);
  */
 
-/*global node2md*/
+/*jslint unparam: true*/
+/*global node2md, tomd, window*/
 
 
 /**
  * expose tomd as a module
  */
 
-(function (global, module) {
+(function (module) {
 
 
   /**
    * Exports.
    */
 
-  var exports = module.exports;
+  //var exports = module.exports;
   module.exports = tomd;
 
 
   var listLevel = 0;
   var listBullet = "- ";
   var preblock = false;
+  var blockquote = false;
 
 
   /**
@@ -97,7 +99,9 @@
       break;
 
     case 'BLOCKQUOTE':
-      markdown += '> ' + processChildren(children) + '\n\n';
+      blockquote = true;
+      markdown += processChildren(children) + '\n\n';
+      blockquote = false;
       break;
 
     case 'DIV':
@@ -117,7 +121,7 @@
       break;
 
     case 'BR':
-      markdown += "\n\n";
+      markdown += "\n";
       break;
 
     case 'CODE':
@@ -167,6 +171,9 @@
     var markdown  = "";
     // node.data & node.nodeValue should be synonymous
     if (node.data.trim() !== "") {
+      if (blockquote) {
+        markdown += "> ";
+      }
       //markdown += node.data.replace(/^[\n\s\t]+/, "")
       //  .replace(/[\s]+/g, " ")
       //  .replace(/</g, "&amp;lt;")
@@ -209,20 +216,20 @@
   }
 
   function tomd(node) {
-    if (typeof node.nodeType === 'undefined') {
-      throw(new Error("Invalid argument; not a Node object"));
+    var typeofNode = typeof node.nodeType;
+    if (typeofNode === 'undefined') {
+      throw (new Error("Invalid argument; not a Node object"));
     }
     //return node2md(node).trim().replace(/[\n]{2,}/g, "\n\n");
     return node2md(node).replace(/^[\n]+/, "").replace(/[\n]{2,}/g, "\n\n");
   }
 
   //return tomd;
-
-  if ('undefined' != typeof window) {
+  var typeofWindow = typeof window;
+  if ('undefined' !== typeofWindow) {
     window.tomd = module.exports;
   }
 
-})(
-    this
-  , 'undefined' != typeof module ? module : {exports: {}}
-);
+}(
+  'undefined' !== typeof module ? module : {exports: {}}
+));
