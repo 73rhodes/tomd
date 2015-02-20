@@ -24,25 +24,20 @@
       <div class="col-md-6">
         <div id="htmlside" class="well" contenteditable="true" onkeyup="updatemd();">
           <h1 id="hello">Edit Me <small>start typing here</small></h1>
-          Bare text with
-          <small>inline</small> 
-          elements.<br/>
+          <p>
+            Text with <small>inline</small> elements.<br/>
+          </p>
           <p>
             Paragraphs.
           </p>
-          <p>
-            Paragraphs with line breaks:<br/>
-            such as this.
-          </p>
+          
           <ul>
             <li>Lists</li>
             <li>with unordered items</li>
-            <ol>
-              <li>Nested lists</li>
-              <li>with ordered items</li>
-            </ol>
           </ul>
-          Bare text and line breaks.<br/>
+          <p>
+            Text and line breaks.<br/>
+          </p>
           <p>
           <code>
             function foo(bar) {
@@ -51,8 +46,9 @@
           </code>
           </p>
 <pre>
-Preformatted, non-code text blocks.
-Should support newlines.
+Preformatted, non-code text blocks
+preserve newlines
+  and whitespace.
 </pre>
 <pre><code>// multiline code blocks
 print("evidently are not working");

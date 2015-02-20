@@ -168,6 +168,12 @@ describe('tomd', function () {
     // */
   });
 
+  describe('Preformatted blocks', function () {
+    it('Pass through pre tags', function () {
+      expect(tomd(elem('<pre>foo\nbar</pre>'))).to.equal('<pre>\nfoo\nbar\n</pre>\n\n');
+    });
+  });
+
   describe('Code formatting', function () {
     it('Inline format');
     it('Multiple lines');

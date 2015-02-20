@@ -115,7 +115,7 @@
       if (children[0] && children[0].nodeName === 'CODE') {
         markdown += '\n\n``' + processChildren(children) + '``\n\n';
       } else {
-        markdown += "\n\n&lt;pre&gt;\n" + processChildren(children) + "\n&lt;/pre&gt;\n\n";
+        markdown += "\n\n<pre>\n" + processChildren(children) + "\n</pre>\n\n";
       }
       preblock = false;
       break;
@@ -135,14 +135,14 @@
     case 'UL':
       listLevel++;
       listBullet = "- ";
-      markdown += "\n\n" + processChildren(children) + "\n\n";
+      markdown += processChildren(children) + "\n\n";
       listLevel--;
       break;
 
     case 'OL':
       listLevel++;
       listBullet = "1. ";
-      markdown += "\n\n" + processChildren(children) + "\n\n";
+      markdown += processChildren(children) + "\n\n";
       listLevel--;
       break;
 
@@ -178,7 +178,12 @@
       //  .replace(/[\s]+/g, " ")
       //  .replace(/</g, "&amp;lt;")
       //  .replace(/>/g, "&amp;gt;");
-      markdown += node.data.replace(/^[\n\t]+/, "").replace(/[\s]+/g, " ").replace(/</g, "&amp;lt;").replace(/>/g, "&amp;gt;");
+      markdown += node.data.replace(/^[\n\t]+/, "");
+      if (!preblock) {
+        markdown = markdown.replace(/[\s]+/g, " ");
+      }
+      //markdown = markdown.replace(/</g, "&amp;lt;");
+      //markdown = markdown.replace(/>/g, "&amp;gt;");
     }
     return markdown;
   }
@@ -221,7 +226,9 @@
       throw (new Error("Invalid argument; not a Node object"));
     }
     //return node2md(node).trim().replace(/[\n]{2,}/g, "\n\n");
-    return node2md(node).replace(/^[\n]+/, "").replace(/[\n]{2,}/g, "\n\n");
+    var markdown = node2md(node).replace(/^[\n]+/, "").replace(/[\n]{2,}/g, "\n\n");
+    markdown = markdown.replace(/\n\n\s/g, "\n\n");
+    return markdown;
   }
 
   //return tomd;
