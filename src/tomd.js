@@ -115,7 +115,7 @@
       if (children[0] && children[0].nodeName === 'CODE') {
         markdown += '\n\n``' + processChildren(children) + '``\n\n';
       } else {
-        markdown += "\n\n<pre>\n" + processChildren(children) + "\n</pre>\n\n";
+        markdown += "\n\n<pre>\n" + processChildren(children) + "</pre>\n\n";
       }
       preblock = false;
       break;
@@ -126,7 +126,7 @@
 
     case 'CODE':
       if (preblock) {
-        markdown += "`\n" + processChildren(children) + "\n`";
+        markdown += "`\n" + processChildren(children) + "`";
       } else {
         markdown += "`" + processChildren(children) + "`";
       }
@@ -182,8 +182,6 @@
       if (!preblock) {
         markdown = markdown.replace(/[\s]+/g, " ");
       }
-      //markdown = markdown.replace(/</g, "&amp;lt;");
-      //markdown = markdown.replace(/>/g, "&amp;gt;");
     }
     return markdown;
   }
