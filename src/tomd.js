@@ -135,14 +135,14 @@
     case 'UL':
       listLevel++;
       listBullet = "- ";
-      markdown += processChildren(children) + "\n\n";
+      markdown += processChildren(children) + '\n\n';
       listLevel--;
       break;
 
     case 'OL':
       listLevel++;
-      listBullet = "1. ";
-      markdown += processChildren(children) + "\n\n";
+      listBullet = '1. ';
+      markdown += processChildren(children) + '\n\n';
       listLevel--;
       break;
 
@@ -152,7 +152,7 @@
       while (i-- && i > 0) {
         listIndent += "  ";
       }
-      markdown += listIndent + (listBullet || "- ") + processChildren(children) + "\n";
+      markdown += '\n' + listIndent + (listBullet || "- ") + processChildren(children);
       break;
 
     default:

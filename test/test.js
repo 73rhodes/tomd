@@ -160,17 +160,15 @@ describe('tomd', function () {
   });
 
   describe('Nested lists', function () {
-    it('should work');
-    /*, function () {
+    it('unordered', function () {
       expect(tomd(elem('<ul><li>hello</li><ul><li>world</li></ul></ul>')))
         .to.equal('- hello\n  - world\n\n');
     });
-    // */
   });
 
   describe('Preformatted blocks', function () {
     it('Pass through pre tags', function () {
-      expect(tomd(elem('<pre>foo\nbar</pre>'))).to.equal('<pre>\nfoo\nbar\n</pre>\n\n');
+      expect(tomd(elem('<pre>foo\nbar</pre>'))).to.equal('<pre>\nfoo\nbar</pre>\n\n');
     });
   });
 
