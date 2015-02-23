@@ -4,6 +4,10 @@ function elem(str) {
   return jQuery(str)[0];
 }
 
+function h2md(str) {
+  return tomd(elem(str));
+}
+
 describe('tomd', function () {
 
   it('is a function', function () {
@@ -73,7 +77,7 @@ describe('tomd', function () {
     it('line break', function () {
       var dom = elem('<blockquote>now is the time<br/>for all good cats</blockquote>');
       var md  = tomd(dom);
-      expect(md).to.equal('> now is the time\n> for all good cats\n\n');
+      expect(md).to.equal('> now is the time\n\n> for all good cats\n\n');
     });
 
     it('multiple line breaks', function () {
@@ -81,65 +85,49 @@ describe('tomd', function () {
       var md  = tomd(dom);
       expect(md).to.equal('> now is the time\n\n> for all good cats\n\n');
     });
+
+    it('in div tags', function () {
+      expect(h2md('<div><blockquote>hello world!</blockquote></div>')).to.equal('> hello world!\n\n');
+    });
+
+    it('with preformatted text', function () {
+      expect(h2md('<blockquote>Hello<pre>world</pre>ok</blockquote>'))
+        .to.equal('> Hello\n> <pre>world</pre>\n> ok\n\n');
+    });
   });
 
   describe('Text styling', function () {
 
     it('Bold', function () {
-      var bold = elem('<b>bold text</b>');
-      var md = tomd(bold);
-      expect(md).to.equal('**bold text**');
-    });
-
-    it('Inline bold', function () {
-      var dom = elem('<p><b>Bold</b>ness</p>');
-      var md  = tomd(dom);
-      expect(md).to.equal('**Bold**ness\n\n');
-    });
-
-    it('Inline bold with space', function () {
       var dom = elem('<p>goodbye <b>cruel</b> world!</p>');
       var md  = tomd(dom);
       expect(md).to.equal('goodbye **cruel** world!\n\n');
     });
 
     it('Italic', function () {
-      var dom = elem('<p><i>Never</i> say never</p>');
-      var md  = tomd(dom);
-      expect(md).to.equal('*Never* say never\n\n');
+      expect(h2md('<p><i>Never</i> say never</p>')).to.equal('*Never* say never\n\n');
     });
 
-    it('Bold in Italics', function () {
-      var dom = elem('<i>Now hear <b>this</b>!</i>');
-      var md  = tomd(dom);
-      expect(md).to.equal('*Now hear **this**!*');
-      // try <i>Now<b>this</b></i>  :-)
+    it('Bold Italics', function () {
+      expect(h2md('<i>Now hear <b>this</b>!</i>')).to.equal('*Now hear **this**!*');
     });
 
-    it('Italics in Bold', function () {
-      var dom = elem('<b>Now hear <i>this</i>!</b>');
-      var md  = tomd(dom);
-      expect(md).to.equal('**Now hear *this*!**');
+    it('Italicized Bold', function () {
+      expect(h2md('<b>Now hear <i>this</i>!</b>')).to.equal('**Now hear *this*!**');
     });
 
     it('Code', function () {
-      var dom = elem('<code>foo(bar);</code>');
-      var md  = tomd(dom);
-      expect(md).to.equal('`foo(bar);`');
+      expect(h2md('<code>foo(bar);</code>')).to.equal('`foo(bar);`');
     });
 
     it('Strikethrough', function () {
-      var dom = elem('<del>strikethrough</del>');
-      var md  = tomd(dom);
-      expect(md).to.equal('~~strikethrough~~');
+      expect(h2md('<del>strikethrough</del>')).to.equal('~~strikethrough~~');
     });
   });
 
   describe('Unordered lists', function () {
     it('Empty list', function () {
-      var dom = elem('<ul></ul>');
-      var md  = tomd(dom);
-      expect(md).to.equal('');
+      expect(h2md('<ul></ul>')).to.equal('');
     });
 
     it('List items', function () {
@@ -147,29 +135,49 @@ describe('tomd', function () {
       var md  = tomd(dom);
       expect(md).to.equal('- John\n- Paul\n- George\n- Ringo\n\n');
     });
+
+    it('Text prefix', function () {
+      expect(h2md('<div>List<ul><li>item</li><li>item2</li></ul></div>'))
+        .to.equal('List\n- item\n- item2\n\n');
+    });
   });
 
   describe('Ordered lists', function () {
     it('Empty list', function () {
-      expect(tomd(elem('<ol></ol>'))).to.equal('');
+      expect(h2md('<ol></ol>')).to.equal('');
     });
 
     it('Ordered items', function () {
-      expect(tomd(elem('<ol><li>alpha</li><li>beta</li></ol>'))).to.equal('1. alpha\n1. beta\n\n');
+      expect(h2md('<ol><li>alpha</li><li>beta</li></ol>')).to.equal('1. alpha\n1. beta\n\n');
     });
   });
 
   describe('Nested lists', function () {
     it('unordered', function () {
-      expect(tomd(elem('<ul><li>hello</li><ul><li>world</li></ul></ul>')))
+      expect(h2md('<ul><li>hello</li><ul><li>world</li></ul></ul>'))
         .to.equal('- hello\n  - world\n\n');
+    });
+
+    it('ordered', function () {
+      expect(h2md('<ol><li>Uno</li><ol><li>Alpha</li></ol></ol>'))
+        .to.equal('1. Uno\n  1. Alpha\n\n');
+    });
+
+    it('OL in UL', function () {
+      expect(h2md('<ul><li>hello</li><ol><li>one</li></ol></ul>'))
+        .to.equal('- hello\n  1. one\n\n');
     });
   });
 
   describe('Preformatted blocks', function () {
     it('Pass through pre tags', function () {
-      expect(tomd(elem('<pre>foo\nbar</pre>'))).to.equal('<pre>\nfoo\nbar</pre>\n\n');
+      expect(h2md('<pre>foobar</pre>')).to.equal('<pre>foobar</pre>\n\n');
     });
+
+    it('In paragraphs', function () {
+      expect(h2md('<div><p>hi</p><pre>hello</pre></div>')).to.equal('hi\n\n<pre>hello</pre>\n\n');
+    });
+
   });
 
   describe('Code formatting', function () {

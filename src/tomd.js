@@ -115,13 +115,23 @@
       if (children[0] && children[0].nodeName === 'CODE') {
         markdown += '\n\n``' + processChildren(children) + '``\n\n';
       } else {
-        markdown += "\n\n<pre>\n" + processChildren(children) + "</pre>\n\n";
+        if (blockquote) {
+          blockquote = false;
+          markdown += "\n> <pre>" + processChildren(children) + "</pre>\n";
+          blockquote = true;
+        } else {
+          markdown += '\n<pre>' + processChildren(children) + "</pre>\n\n";
+        }
       }
       preblock = false;
       break;
 
     case 'BR':
       markdown += "\n";
+      if (blockquote) {
+        // line breaks in blockquotes translate to blank lines
+        markdown += '\n';
+      }
       break;
 
     case 'CODE':
@@ -174,12 +184,9 @@
       if (blockquote) {
         markdown += "> ";
       }
-      //markdown += node.data.replace(/^[\n\s\t]+/, "")
-      //  .replace(/[\s]+/g, " ")
-      //  .replace(/</g, "&amp;lt;")
-      //  .replace(/>/g, "&amp;gt;");
       markdown += node.data.replace(/^[\n\t]+/, "");
       if (!preblock) {
+        // Collapse whitespace outside of <pre> blocks
         markdown = markdown.replace(/[\s]+/g, " ");
       }
     }
