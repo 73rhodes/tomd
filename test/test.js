@@ -34,13 +34,19 @@ describe('tomd', function () {
     it('One line', function () {
       var dom = elem('<p>one line paragraph</p>');
       var md  = tomd(dom);
-      expect(md).to.equal('one line paragraph\n\n');
+      expect(md).to.equal('one line paragraph');
+    });
+
+    it('Consecutive paragraphs', function () {
+      var dom = elem('<div><p>one line</p><p>and another</p></div>');
+      var md = tomd(dom);
+      expect(md).to.equal('one line\n\nand another\n\n');
     });
 
     it('GFM Multiline paragraph', function () {
       var dom = elem('<p>roses are red<br/>violets are blue</p>');
       var md  = tomd(dom);
-      expect(md).to.equal('roses are red\nviolets are blue\n\n');
+      expect(md).to.equal('roses are red<br/>\nviolets are blue');
     });
   });
 
@@ -54,7 +60,7 @@ describe('tomd', function () {
       for (i = 1; i <= 7; i++) {
         hdr = elem('<h' + i + '>Header ' + i + '</h' + i + '>');
         md = tomd(hdr);
-        expect(md).to.equal(prefix + ' Header ' + i + '\n\n');
+        expect(md).to.equal(prefix + ' Header ' + i);
         prefix += "#";
       }
     });
@@ -62,7 +68,7 @@ describe('tomd', function () {
     it('H* with inline elements', function () {
       var hdr = elem('<h1>Header <small>small <b>stuff</b></small></h1>');
       var md = tomd(hdr);
-      expect(md).to.equal('# Header <SMALL>small **stuff**</SMALL>\n\n');
+      expect(md).to.equal('# Header <SMALL>small **stuff**</SMALL>');
     });
   });
 
@@ -71,29 +77,26 @@ describe('tomd', function () {
     it('single line', function () {
       var dom = elem('<blockquote>now is the time</blockquote>');
       var md  = tomd(dom);
-      expect(md).to.equal('> now is the time\n\n');
+      expect(md).to.equal('> now is the time');
     });
 
-    it('line break', function () {
-      var dom = elem('<blockquote>now is the time<br/>for all good cats</blockquote>');
+    it('paragraphs', function () {
+      //var dom = elem('<div><blockquote>Hello.<p>World!</p></blockquote></div>');
+      var dom = elem(
+        "<blockquote>" +
+        "<p>Blockquote</p>" +
+        "<p>Second paragraph</p>" +
+        "<h2>header</h2>" +
+        "</blockquote>"
+      );
       var md  = tomd(dom);
-      expect(md).to.equal('> now is the time\n\n> for all good cats\n\n');
+      expect(md).to.equal("> Blockquote\n> \n> Second paragraph\n> \n> ## header");
+      //expect(md).to.equal("> Blockquote\n> \n> Second paragraph");
     });
 
-    it('multiple line breaks', function () {
-      var dom = elem('<blockquote>now is the time<br/><br/>for all good cats</blockquote>');
-      var md  = tomd(dom);
-      expect(md).to.equal('> now is the time\n\n> for all good cats\n\n');
-    });
+    // TODO blockquote containing preformatted text
+    // TODO blockquote containing a mix of elements
 
-    it('in div tags', function () {
-      expect(h2md('<div><blockquote>hello world!</blockquote></div>')).to.equal('> hello world!\n\n');
-    });
-
-    it('with preformatted text', function () {
-      expect(h2md('<blockquote>Hello<pre>world</pre>ok</blockquote>'))
-        .to.equal('> Hello\n> <pre>world</pre>\n> ok\n\n');
-    });
   });
 
   describe('Text styling', function () {
@@ -101,11 +104,11 @@ describe('tomd', function () {
     it('Bold', function () {
       var dom = elem('<p>goodbye <b>cruel</b> world!</p>');
       var md  = tomd(dom);
-      expect(md).to.equal('goodbye **cruel** world!\n\n');
+      expect(md).to.equal('goodbye **cruel** world!');
     });
 
     it('Italic', function () {
-      expect(h2md('<p><i>Never</i> say never</p>')).to.equal('*Never* say never\n\n');
+      expect(h2md('<p><i>Never</i> say never</p>')).to.equal('*Never* say never');
     });
 
     it('Bold Italics', function () {
@@ -193,13 +196,58 @@ describe('tomd', function () {
     it('Horizontal Rule', function () {
       var hr = elem('<hr/>');
       var md = tomd(hr);
-      expect(md).to.equal('* * *\n\n');
+      expect(md).to.equal('* * *');
     });
   });
 
+  // Daring Fireball example
+  describe('Daring Fireball', function () {
+    it('Example 1', function () {
+      var md = h2md(
+        "<div><h1>A First Level Header</h1>" +
+        "<h2>A Second Level Header</h2>" +
+        "<p>Now is the time for all good men to come to " +
+        "the aid of their country. This is just a " +
+        "regular paragraph.</p>" +
+        "<p>The quick brown fox jumped over the " +
+        "lazy dog's back.</p>" +
+        "<h3>Header 3</h3>" +
+        "<blockquote>" +
+        "<p>This is a blockquote.</p>" +
+        "<p>This is the second paragraph in the blockquote.</p>" +
+        //"<h2>This is an H2 in a blockquote</h2>" +
+        "</blockquote></div>"
+      );
+      expect(md).to.equal(
+        "# A First Level Header\n" +
+        "\n" +
+        "## A Second Level Header\n" +
+        "\n" +
+        "Now is the time for all good men to come to " +
+        "the aid of their country. This is just a " +
+        "regular paragraph.\n" +
+        "\n" +
+        "The quick brown fox jumped over the lazy " +
+        "dog's back.\n" +
+        "\n" +
+        "### Header 3\n" +
+        "\n" +
+        "> This is a blockquote.\n" +
+        "> \n" +
+        "> This is the second paragraph in the blockquote.\n" +
+        //">\n" +
+        //"> ## This is an H2 in a blockquote\n"
+        "\n"
+      );
+    });
+  });
+
+  /*
+  // Extra Github-flavoured Markdown
   describe('Task lists');
   describe('References');
   describe('Fenced code blocks');
   describe('Tables');
+  */
 
 });

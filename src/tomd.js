@@ -26,15 +26,21 @@
    * Exports.
    */
 
-  //var exports = module.exports;
   module.exports = tomd;
 
 
   var listLevel = 0;
   var listBullet = "- ";
+  // in a preformatted block
   var preblock = false;
+  // in a blockquote
   var blockquote = false;
-
+  // block element has been closed
+  var blockClosed = false;
+  var blockElements = [
+    "HR", "H1", "H2", "H3", "H4", "H5", "H6", "H7",
+    "BLOCKQUOTE", "DIV", "SECTION", "P", "OL", "UL"
+  ];
 
   /**
    * Convert a nodelist (tree of elements) to markdown.
@@ -63,9 +69,16 @@
     var markdown = "";
     var children = node.childNodes;
 
+    if (blockClosed) {
+      markdown += blockquote ? '\n> \n> ' : '\n\n';
+      blockClosed = false;
+    }
+
     // nodeName and tagName should be synonymous
     switch (node.nodeName) {
 
+
+    // Inline elements
     case 'B':
       markdown += '**' + processChildren(children) + '**';
       break;
@@ -78,10 +91,20 @@
       markdown += '~~' + processChildren(children) + '~~';
       break;
 
-    case 'HR':
-      markdown += '* * *\n\n';
+    case 'CODE':
+      if (preblock) {
+        markdown += "`\n" + processChildren(children) + "`";
+      } else {
+        markdown += "`" + processChildren(children) + "`";
+      }
       break;
 
+
+    // Block elements
+    case 'HR':
+      markdown += '* * *';
+      blockClosed = true;
+      break;
 
     case 'H1':
     case 'H2':
@@ -95,19 +118,27 @@
       while (size--) {
         hdr += '#';
       }
-      markdown += '\n\n' + hdr + ' ' + processChildren(children) + '\n\n';
+      markdown += hdr + ' ' + processChildren(children);
+      blockClosed = true;
       break;
 
     case 'BLOCKQUOTE':
+      debugger;
       blockquote = true;
-      markdown += processChildren(children) + '\n\n';
+      markdown += "> " + processChildren(children);
+      blockClosed = true;
       blockquote = false;
       break;
 
     case 'DIV':
-    case 'P':
     case 'SECTION':
       markdown += '\n\n' + processChildren(children) + '\n\n';
+      blockClosed = true;
+      break;
+
+    case 'P':
+      markdown += processChildren(children);
+      blockClosed = true;
       break;
 
     case 'PRE':
@@ -124,22 +155,7 @@
         }
       }
       preblock = false;
-      break;
-
-    case 'BR':
-      markdown += "\n";
-      if (blockquote) {
-        // line breaks in blockquotes translate to blank lines
-        markdown += '\n';
-      }
-      break;
-
-    case 'CODE':
-      if (preblock) {
-        markdown += "`\n" + processChildren(children) + "`";
-      } else {
-        markdown += "`" + processChildren(children) + "`";
-      }
+      blockClosed = true;
       break;
 
     case 'UL':
@@ -147,6 +163,7 @@
       listBullet = "- ";
       markdown += processChildren(children) + '\n\n';
       listLevel--;
+      blockClosed = true;
       break;
 
     case 'OL':
@@ -154,8 +171,10 @@
       listBullet = '1. ';
       markdown += processChildren(children) + '\n\n';
       listLevel--;
+      blockClosed = true;
       break;
 
+    // List items
     case 'LI':
       var listIndent = "";
       var i = listLevel;
@@ -165,11 +184,20 @@
       markdown += '\n' + listIndent + (listBullet || "- ") + processChildren(children);
       break;
 
+    // Line breaks
+    case 'BR':
+      markdown += "<br/>\n";
+      if (blockquote) {
+        // line breaks in blockquotes translate to blank lines
+        markdown += '\n';
+      }
+      break;
+
+    // Verbatim tags
     default:
       markdown += "<" + node.nodeName + ">" +
         processChildren(children) + "</" + node.nodeName + ">";
       break;
-
     }
 
     return markdown;
@@ -179,14 +207,17 @@
   function processText(node) {
 
     var markdown  = "";
-    // node.data & node.nodeValue should be synonymous
     if (node.data.trim() !== "") {
+      // Denote blockquotes
+      // TODO support nested blockquotes
+      /*
       if (blockquote) {
         markdown += "> ";
       }
+      // */
       markdown += node.data.replace(/^[\n\t]+/, "");
+      // Collapse whitespace outside of <pre> blocks
       if (!preblock) {
-        // Collapse whitespace outside of <pre> blocks
         markdown = markdown.replace(/[\s]+/g, " ");
       }
     }
@@ -230,9 +261,13 @@
     if (typeofNode === 'undefined') {
       throw (new Error("Invalid argument; not a Node object"));
     }
-    //return node2md(node).trim().replace(/[\n]{2,}/g, "\n\n");
-    var markdown = node2md(node).replace(/^[\n]+/, "").replace(/[\n]{2,}/g, "\n\n");
-    markdown = markdown.replace(/\n\n\s/g, "\n\n");
+    var markdown = node2md(node);
+    // Remove leading newlines
+    markdown = markdown.replace(/^[\n]+/, "");
+    // Collapse multiple blank lines to single blank lines
+    markdown = markdown.replace(/[\n]{2,}/g, "\n\n");
+    // Strip whitespace in blank lines
+    markdown = markdown.replace(/\n\n[\s]+/g, "\n\n");
     return markdown;
   }
 
