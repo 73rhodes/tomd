@@ -16,11 +16,12 @@ There are a couple of projects to convert HTML to markdown:
 
 - Dom Christie's [to-markdown](http://domchristie.github.io/to-markdown/).
 - David Bengoa's [gist](https://gist.github.com/YouWoTMA/1762527/).
+- Alasdair Mercer's [html.md](https://github.com/neocotic/html.md)
 
-Unfortunately, one only works on well-formed HTML and the other is missing
-support for a number of things like escape sequences, multi-line code blocks,
-or inline elements nested in header tags.
+Unfortunately, I hit some limitations with these, such as only works on well-formed HTML,
+missing support for like escape sequences, multi-line code blocks, or certain kinds of nested
+elements.
 
-This module is meant to leverage the robust HTML capabilities of the web
-browser, while supporting all the standard features of github-flavoured 
-markdown.
+This module is meant to leverage the robust HTML-parsing capabilities of the web
+browser, while supporting all the standard features of markdown. It aims for parity
+with markd.js, so that fully bi-directional HTML/Markdown is possible.
