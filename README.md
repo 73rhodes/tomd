@@ -1,5 +1,7 @@
 # tomd
 
+[![DeepScan grade](https://deepscan.io/api/projects/1954/branches/8903/badge/grade.svg)](https://deepscan.io/dashboard#view=project&pid=1954&bid=8903)
+
 A utility to convert HTML to Markdown using the DOM. Work-in-progress.
 
 ## Usage
