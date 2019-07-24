@@ -4,7 +4,7 @@
  * Inspired by David Bengoa's [gist](https://gist.github.com/YouWoTMA/1762527/)
  * 
  * @example
- *   var markdown = toMarkdown(document.getElementById("content"));
+ *   var markdown = tomd(document.getElementById("content"));
  *
  * @example
  *   // Convert HTML strings with jQuery
